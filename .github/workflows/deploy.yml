@@ -1,8 +1,9 @@
 name: Deploy
 
+# Manual: só funciona se os secrets DATABRICKS_HOST e DATABRICKS_TOKEN existirem.
+# Na Free Edition, faça o deploy local com `databricks bundle deploy -t free`.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
