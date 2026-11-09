@@ -1,0 +1,19 @@
+[project]
+name = "ocupacao-urbana"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = ["requests>=2.31"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["src/bronze", "src/silver", "src/gold", "src/00_setup.py"]  # notebooks
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]

@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+.databricks/
+.env
+*.egg-info/
+# Dados nunca vão para o repositório
+data/
+*.csv
+*.parquet
+dashboards/request_dashboard.json

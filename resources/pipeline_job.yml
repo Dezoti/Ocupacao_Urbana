@@ -1,0 +1,66 @@
+resources:
+  jobs:
+    pipeline_ocupacao:
+      name: "[${bundle.target}] pipeline-ocupacao-urbana"
+
+      # Os dados do Censo são decenais e o CadÚnico é mensal: rodar 1x por mês basta.
+      trigger:
+        pause_status: PAUSED   # ative em prod depois de validar a primeira execução
+        periodic:
+          interval: 30
+          unit: DAYS
+
+      email_notifications:
+        on_failure:
+          - ${workspace.current_user.userName}
+
+      parameters:
+        - name: catalog
+          default: ${var.catalog}
+        - name: municipio_codigo
+          default: ${var.municipio_codigo}
+
+      tasks:
+        - task_key: setup
+          notebook_task:
+            notebook_path: ../src/00_setup.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+
+        - task_key: bronze_ibge
+          depends_on: [{ task_key: setup }]
+          notebook_task:
+            notebook_path: ../src/bronze/01_ibge_domicilios.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+
+        - task_key: bronze_cadunico
+          depends_on: [{ task_key: setup }]
+          notebook_task:
+            notebook_path: ../src/bronze/02_cadunico_pop_rua.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+
+        - task_key: silver_domicilios
+          depends_on: [{ task_key: bronze_ibge }]
+          notebook_task:
+            notebook_path: ../src/silver/01_domicilios_censo.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+
+        - task_key: silver_pop_rua
+          depends_on: [{ task_key: bronze_cadunico }]
+          notebook_task:
+            notebook_path: ../src/silver/02_pop_rua.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"
+              municipio_codigo: "{{job.parameters.municipio_codigo}}"
+
+        - task_key: gold_indicadores
+          depends_on:
+            - task_key: silver_domicilios
+            - task_key: silver_pop_rua
+          notebook_task:
+            notebook_path: ../src/gold/01_indicadores.py
+            base_parameters:
+              catalog: "{{job.parameters.catalog}}"

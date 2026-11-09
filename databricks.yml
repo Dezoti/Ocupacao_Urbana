@@ -1,0 +1,19 @@
+bundle:
+  name: ocupacao-urbana
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    description: Catálogo do Unity Catalog onde as tabelas serão criadas
+    default: workspace
+  municipio_codigo:
+    description: Código IBGE do município (7 dígitos). Itajaí-SC = 4208203
+    default: "4208203"
+
+targets:
+  # A Databricks Free Edition tem um único workspace, então há um único ambiente.
+  free:
+    default: true
+

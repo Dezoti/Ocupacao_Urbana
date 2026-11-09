@@ -1,0 +1,583 @@
+{
+  "datasets": [
+    {
+      "name": "ds_ocupacao",
+      "displayName": "Ocupação do município",
+      "queryLines": [
+        "SELECT municipio, ano, domicilios_ocupados, domicilios_vagos, domicilios_uso_ocasional, ",
+        "domicilios_total, pct_vagos / 100.0 AS taxa_vagos ",
+        "FROM ocupacao_municipio"
+      ]
+    },
+    {
+      "name": "ds_composicao",
+      "displayName": "Composição dos domicílios",
+      "queryLines": [
+        "SELECT 'Ocupados' AS tipo, domicilios_ocupados AS qtd FROM ocupacao_municipio ",
+        "UNION ALL SELECT 'Vagos', domicilios_vagos FROM ocupacao_municipio ",
+        "UNION ALL SELECT 'Uso ocasional', domicilios_uso_ocasional FROM ocupacao_municipio"
+      ]
+    },
+    {
+      "name": "ds_pop_rua",
+      "displayName": "Pessoas em situação de rua por ano",
+      "queryLines": [
+        "SELECT CAST(ano AS STRING) AS ano, qtd_pop_rua ",
+        "FROM pop_rua_serie ",
+        "ORDER BY ano"
+      ]
+    },
+    {
+      "name": "ds_indicadores",
+      "displayName": "Indicadores por ano",
+      "queryLines": [
+        "SELECT CAST(ano_cadunico AS STRING) AS ano_cadunico, qtd_pop_rua, defasagem_anos, ",
+        "domicilios_vagos, domicilios_uso_ocasional, ",
+        "vagos_por_pessoa_em_situacao_de_rua AS vagos_por_pessoa ",
+        "FROM indicadores_municipio ",
+        "ORDER BY ano_cadunico"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "visao-geral",
+      "displayName": "Visão geral",
+      "layout": [
+        {
+          "widget": {
+            "name": "header",
+            "multilineTextboxSpec": {
+              "lines": [
+                "# Ocupação urbana: imóveis ocupados e vagos x pessoas em situação de rua\n",
+                "\n",
+                "**Itajaí (SC)** · Domicílios do Censo 2022 (IBGE) e pessoas em situação de rua cadastradas no CadÚnico (Observatório UFMG, série anual 2012-2021)."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-ocupados",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ocupacao",
+                  "fields": [
+                    {
+                      "name": "domicilios_ocupados",
+                      "expression": "`domicilios_ocupados`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "domicilios_ocupados",
+                  "displayName": "Domicílios ocupados",
+                  "format": {
+                    "type": "number",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 0
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Domicílios ocupados"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-vagos",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ocupacao",
+                  "fields": [
+                    {
+                      "name": "domicilios_vagos",
+                      "expression": "`domicilios_vagos`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "domicilios_vagos",
+                  "displayName": "Domicílios vagos",
+                  "format": {
+                    "type": "number",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 0
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Domicílios vagos"
+              }
+            }
+          },
+          "position": {
+            "x": 3,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-uso-ocasional",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ocupacao",
+                  "fields": [
+                    {
+                      "name": "domicilios_uso_ocasional",
+                      "expression": "`domicilios_uso_ocasional`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "domicilios_uso_ocasional",
+                  "displayName": "Domicílios de uso ocasional",
+                  "format": {
+                    "type": "number",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 0
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Domicílios de uso ocasional"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "kpi-taxa-vagos",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_ocupacao",
+                  "fields": [
+                    {
+                      "name": "taxa_vagos",
+                      "expression": "`taxa_vagos`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "taxa_vagos",
+                  "displayName": "Vagos (% dos domicílios)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Vagos (% dos domicílios)"
+              }
+            }
+          },
+          "position": {
+            "x": 9,
+            "y": 3,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "composicao-domicilios",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_composicao",
+                  "fields": [
+                    {
+                      "name": "tipo",
+                      "expression": "`tipo`"
+                    },
+                    {
+                      "name": "qtd",
+                      "expression": "`qtd`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "qtd",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Domicílios"
+                },
+                "color": {
+                  "fieldName": "tipo",
+                  "displayName": "Tipo",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "Ocupados",
+                        "color": "#0072B2"
+                      },
+                      {
+                        "value": "Vagos",
+                        "color": "#E69F00"
+                      },
+                      {
+                        "value": "Uso ocasional",
+                        "color": "#009E73"
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": true
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Composição dos domicílios particulares permanentes"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 6,
+            "width": 5,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "pop-rua-por-ano",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_pop_rua",
+                  "fields": [
+                    {
+                      "name": "ano",
+                      "expression": "`ano`"
+                    },
+                    {
+                      "name": "qtd_pop_rua",
+                      "expression": "`qtd_pop_rua`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "ano",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Ano"
+                },
+                "y": {
+                  "fieldName": "qtd_pop_rua",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Pessoas cadastradas"
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Pessoas em situação de rua no CadÚnico, por ano"
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 6,
+            "width": 7,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "vagos-por-pessoa",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_indicadores",
+                  "fields": [
+                    {
+                      "name": "ano_cadunico",
+                      "expression": "`ano_cadunico`"
+                    },
+                    {
+                      "name": "vagos_por_pessoa",
+                      "expression": "`vagos_por_pessoa`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "ano_cadunico",
+                  "scale": {
+                    "type": "categorical"
+                  },
+                  "displayName": "Ano do CadÚnico"
+                },
+                "y": {
+                  "fieldName": "vagos_por_pessoa",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "displayName": "Vagos por pessoa",
+                  "format": {
+                    "type": "number",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 1
+                    }
+                  }
+                }
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Domicílios vagos (Censo 2022) por pessoa em situação de rua",
+                "showDescription": true,
+                "description": "Estoque de vagos de 2022 dividido pelas pessoas cadastradas em cada ano."
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tabela-indicadores",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "ds_indicadores",
+                  "fields": [
+                    {
+                      "name": "ano_cadunico",
+                      "expression": "`ano_cadunico`"
+                    },
+                    {
+                      "name": "qtd_pop_rua",
+                      "expression": "`qtd_pop_rua`"
+                    },
+                    {
+                      "name": "defasagem_anos",
+                      "expression": "`defasagem_anos`"
+                    },
+                    {
+                      "name": "domicilios_vagos",
+                      "expression": "`domicilios_vagos`"
+                    },
+                    {
+                      "name": "domicilios_uso_ocasional",
+                      "expression": "`domicilios_uso_ocasional`"
+                    },
+                    {
+                      "name": "vagos_por_pessoa",
+                      "expression": "`vagos_por_pessoa`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "ano_cadunico",
+                    "displayName": "Ano (CadÚnico)"
+                  },
+                  {
+                    "fieldName": "qtd_pop_rua",
+                    "displayName": "Pessoas em situação de rua"
+                  },
+                  {
+                    "fieldName": "defasagem_anos",
+                    "displayName": "Defasagem até o Censo (anos)"
+                  },
+                  {
+                    "fieldName": "domicilios_vagos",
+                    "displayName": "Vagos (2022)"
+                  },
+                  {
+                    "fieldName": "domicilios_uso_ocasional",
+                    "displayName": "Uso ocasional (2022)"
+                  },
+                  {
+                    "fieldName": "vagos_por_pessoa",
+                    "displayName": "Vagos por pessoa",
+                    "format": {
+                      "type": "number",
+                      "decimalPlaces": {
+                        "type": "max",
+                        "places": 1
+                      }
+                    }
+                  }
+                ]
+              },
+              "frame": {
+                "showTitle": true,
+                "title": "Indicadores por ano"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 12,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "notas",
+            "multilineTextboxSpec": {
+              "lines": [
+                "**Como ler:** o Censo é uma foto de 2022 e a série do CadÚnico termina em 2021, então a razão usa sempre o estoque de 2022 (veja a defasagem na tabela). O CadÚnico subestima o total de pessoas em situação de rua, e o aumento a partir de 2017 pode refletir mais cadastramento. \"Uso ocasional\" (casas de veraneio) não equivale a imóvel ocioso."
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 18,
+            "width": 12,
+            "height": 2
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "canvasBackgroundColor": {
+        "light": "#FCFCFC",
+        "dark": "#1F272D"
+      },
+      "widgetBackgroundColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "widgetBorderColor": {
+        "light": "#FFFFFF",
+        "dark": "#11171C"
+      },
+      "fontColor": {
+        "light": "#11171C",
+        "dark": "#E8ECF0"
+      },
+      "selectionColor": {
+        "light": "#2272B4",
+        "dark": "#8ACAFF"
+      },
+      "visualizationColors": [
+        "#0072B2",
+        "#E69F00",
+        "#009E73",
+        "#CC79A7",
+        "#D55E00"
+      ],
+      "widgetHeaderAlignment": "LEFT"
+    }
+  }
+}
