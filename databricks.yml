@@ -11,9 +11,14 @@ variables:
   municipio_codigo:
     description: Código IBGE do município (7 dígitos). Itajaí-SC = 4208203
     default: "4208203"
+  warehouse_id:
+    description: ID do SQL warehouse que executa as consultas do dashboard (databricks warehouses list)
 
 targets:
   # A Databricks Free Edition tem um único workspace, então há um único ambiente.
   free:
     default: true
-
+    # O host vem do login (databricks auth login) ou da variável DATABRICKS_HOST;
+    # o CLI não aceita interpolação em workspace.host.
+    variables:
+      warehouse_id: ee81d444147fdca1

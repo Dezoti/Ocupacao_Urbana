@@ -1,0 +1,9 @@
+resources:
+  dashboards:
+    ocupacao_itajai:
+      display_name: "Ocupação urbana - Itajaí"
+      file_path: ../dashboards/ocupacao_itajai.lvdash.json
+      warehouse_id: ${var.warehouse_id}
+      # As consultas do JSON usam só o nome da tabela; catálogo e schema vêm daqui.
+      dataset_catalog: ${var.catalog}
+      dataset_schema: gold
